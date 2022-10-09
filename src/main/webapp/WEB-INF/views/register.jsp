@@ -42,35 +42,40 @@
 				<hr class="d-sm-none">
 			</div>
 			<div class="col-sm-8">
-				<h1>${error}</h1>
+			<div id="msg"></div>
+			<c:if test="${error != null }">
+			<div class="alert alert-success">
+   				${error}
+  			</div>
+  			</c:if>
 				<form:form method="POST"
-					action="${pageContext.servletContext.contextPath}/login"
+					action="${pageContext.servletContext.contextPath}/register"
 					modelAttribute="register">
-					<div class="mb-3 mt-3">
-							<form:label path="licenseNo"  class="form-label">License Number</form:label>
-							<form:input type="text" path="licenseNo"  class="form-control" placeholder="Enter License No"/>
+					<div class="mb-3 mt-3" id="licenseNo">
+							<form:label path="licenseNoInput"  class="form-label">License Number</form:label>
+							<form:input type="text" path="licenseNoInput"  class="form-control" placeholder="Enter License No"/>
 						</div>
 						
-						<div class="mb-3">
-							<form:label path="passportNo"  class="form-label">Passport</form:label>
-							<form:input type="text" path="passportNo"  class="form-control" placeholder="Enter Passport No"/>
+						<div class="mb-3" id="passportNo">
+							<form:label path="passportNoInput"  class="form-label">Passport</form:label>
+							<form:input type="text" path="passportNoInput"  class="form-control" placeholder="Enter Passport No"/>
 						</div>
 						<button type="button" id="verifyVoter" class="btn btn-primary" >Verify Voter Exist</button>
-						
-						<div class="mb-3 mt-3">
+						<input type="hidden" id="voterId" name="voterId" value=""/>
+						<div class="mb-3 mt-3" style="display:none" id="emailId">
 							<form:label path="emailId"  class="form-label">emailId</form:label>
 							<form:input type="email" path="emailId"  class="form-control" placeholder="Enter email"/>
 						</div>
-						<div class="mb-3">
+						<div class="mb-3" id="pass" style="display:none">
 							<form:label path="pass"  class="form-label">password</form:label>
 							<form:input type="password" path="pass"  class="form-control" placeholder="Enter password"/>
 						 </div>
-						 <div class="mb-3">
+						 <div class="mb-3" id="confPass" style="display:none">
 							<form:label path="confPass"  class="form-label">password</form:label>
 							<form:input type="password" path="confPass"  class="form-control" placeholder="Confirm password"/>
 						 </div>
 						 
-						 <button type="submit" class="btn btn-primary">Submit</button>
+						 <button type="submit" id="submitBtn"  style="display:none" class="btn btn-primary">Submit</button>
 						
 				</form:form>
 			</div>
@@ -80,19 +85,32 @@
 	<script>
 	$("#verifyVoter").click(function() {
 			
-			var licenseNo= $('#licenseNo').val();;
-			var passportNo= $('#passportNo').val();;
-			
+			var licenseNo= document.getElementById('licenseNoInput').value;
+			var passportNo=document.getElementById('passportNoInput').value;
+			var ctx = "${pageContext.request.contextPath}";
 			 $.ajax({
-				 	url:"http://localhost:8081/vs_front_end/verify-identity",
+				 	url:ctx+"/verify-identity?licenseNo="+licenseNo+"&passportNo="+passportNo,
 					type:'GET',
 					dataType: 'json',
-					data:{
-						licenseNo: licenseNo,
-						passportNo: passportNo
-					 },
+					
 					 success:function(data){
-					 	alert("Data: " + data);
+						if(data.status=="201"){
+							$('#msg').text("Voter is not exist");
+							$('#msg').addClass('alert alert-danger');
+							
+						}else{
+							$('#msg').text("Voter found! Please configure login details");
+							$('#msg').addClass('alert alert-success');
+							$("#confPass").show();
+							$("#submitBtn").show();
+							$("#pass").show();
+							$("#emailId").show();
+							$("#passportNo").hide();
+							$("#licenseNo").hide();
+							$("#verifyVoter").hide();
+							document.getElementById("voterId").value = data.id;
+							
+						}
 					 }
 			});
 					  

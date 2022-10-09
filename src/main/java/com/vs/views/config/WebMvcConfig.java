@@ -2,8 +2,10 @@ package com.vs.views.config;
 
 
 import org.springframework.context.annotation.Bean;
+
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
@@ -22,6 +24,7 @@ import org.springframework.web.util.UrlPathHelper;
 @ComponentScan(basePackages = "com.vs.views")
 @EnableWebMvc
 @EnableScheduling
+@PropertySource("classpath:application.properties")
 public class WebMvcConfig implements WebMvcConfigurer {
 
 	
@@ -51,6 +54,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 		configurer.setUrlPathHelper(pathHelper);
 	}
 
+	
 	
 
 	@Bean

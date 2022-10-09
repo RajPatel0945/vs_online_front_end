@@ -15,6 +15,7 @@
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
 <style>
+
 .fakeimg {
 	height: 200px;
 	background: #aaa;
@@ -41,7 +42,17 @@
 				<hr class="d-sm-none">
 			</div>
 			<div class="col-sm-8">
-				<h1>${error}</h1>
+			<c:if test="${error != null }">
+			<div class="alert alert-danger">
+  					${error}
+  			</div>
+				</c:if>
+				
+				<c:if test="${success != null }">
+			<div class="alert alert-success">
+  					${success}
+  			</div>
+				</c:if>
 				<form:form method="POST"
 					action="${pageContext.servletContext.contextPath}/login"
 					modelAttribute="login">

@@ -1,9 +1,12 @@
 package com.vs.views.controllers;
 
+import java.util.Map;
+
 import javax.validation.Valid;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
@@ -26,6 +29,7 @@ public class LoginController {
 	
 	@Autowired LoginService loginService;
 
+	
 	@GetMapping("login")
 	public ModelAndView getLogin() {
 		return new ModelAndView("login","login",new LoginDataBean());
@@ -36,7 +40,8 @@ public class LoginController {
 			ModelMap modelMap,RedirectAttributes redirectAttrs) {
 		String status=loginService.verifyCredentials(login);
 		if(status.equals("200")) {
-			return "home";	
+			 redirectAttrs.addFlashAttribute("error", "You are successfully Logged in.");
+			 return "redirect:/election-list";
 		}else {
 			modelMap.addAttribute("emailId", login.getEmailId());
 	        modelMap.addAttribute("password", login.getPassword());
@@ -50,11 +55,36 @@ public class LoginController {
 		return new ModelAndView("register","register",new RegisterDataBean());
 	}
 	
+	@PostMapping("register")
+	public String submitRegister(@Valid @ModelAttribute("register") RegisterDataBean register, BindingResult result, 
+			ModelMap modelMap,RedirectAttributes redirectAttrs) {
+		
+		Map<String,Object> mapResult=loginService.registerUser(register);
+		if(mapResult.get("statusCode").equals("200")) {
+			 redirectAttrs.addFlashAttribute("success", "You are successfully Registered.");
+			 return "redirect:/login";
+		}else if(mapResult.get("statusCode").equals("203")) {
+			
+	        redirectAttrs.addFlashAttribute("error", "Password and confirm password is not matching.");
+			return "redirect:/register";
+		} else {
+			 redirectAttrs.addFlashAttribute("error", "Registration process failed.");
+				return "redirect:/register";
+		}
+	}
+	
 	@GetMapping(value = "verify-identity")
 	@ResponseBody
-	public String verifyVoterExist(@RequestParam String licenseNo, @RequestParam String passportNo) {
-		System.out.print(licenseNo+"::"+passportNo);
+	public Map<String, Object> verifyVoterExist(@RequestParam("licenseNo")String licenseNo, @RequestParam("passportNo") String passportNo) {
+
 		return loginService.verifyVoterExist(licenseNo,passportNo);
 	}
+	
+
+	@GetMapping("election-list")
+	public ModelAndView getElectionList() {
+		return new ModelAndView("home","home",new RegisterDataBean());
+	}
+	
 	
 }
