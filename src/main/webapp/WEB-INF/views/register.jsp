@@ -19,7 +19,9 @@
 	height: 200px;
 	background: #aaa;
 }
-
+form .error {
+  color: #ff0000;
+}
 </style>
 </head>
 </head>
@@ -50,7 +52,7 @@
   			</c:if>
 				<form:form method="POST"
 					action="${pageContext.servletContext.contextPath}/register"
-					modelAttribute="register">
+					modelAttribute="register" name="register">
 					<div class="mb-3 mt-3" id="licenseNo">
 							<form:label path="licenseNoInput"  class="form-label">License Number</form:label>
 							<form:input type="text" path="licenseNoInput"  class="form-control" placeholder="Enter License No"/>
@@ -68,7 +70,7 @@
 						</div>
 						<div class="mb-3" id="pass" style="display:none">
 							<form:label path="pass"  class="form-label">password</form:label>
-							<form:input type="password" path="pass"  class="form-control" placeholder="Enter password"/>
+							<form:input type="password"  path="pass"  class="form-control" placeholder="Enter password"/>
 						 </div>
 						 <div class="mb-3" id="confPass" style="display:none">
 							<form:label path="confPass"  class="form-label">password</form:label>
@@ -82,7 +84,70 @@
 		</div>
 	</div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
 	<script>
+	jQuery.validator.addMethod("emailCustomFormat", function (value, element) {
+        return this.optional(element) || /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(value);
+    }, "Please enter valid email address");
+	
+	jQuery.validator.addMethod("pwcheck", function(value) {
+		   return /^[A-Za-z0-9\d=!\-@._*]*$/.test(value) // consists of only these
+		       && /[a-z]/.test(value) // has a lowercase letter
+		       && /\d/.test(value) // has a digit
+		});
+	$(function() {
+		  // Initialize form validation on the registration form.
+		  // It has the name attribute "registration"
+		  $("form[name='register']").validate({
+		    // Specify validation rules
+		    rules: {
+		      // The key name on the left side is the name attribute
+		      // of an input field. Validation rules are defined
+		      // on the right side
+		      emailId:{
+		    	  required : true,
+		    	  emailCustomFormat : true
+		      },
+		 
+		      pass: {
+		        required: true,
+		        minlength: 8,
+		        maxlength:15,
+		        pwcheck: true
+		      },
+		      confPass: {
+			        required: true,
+			        minlength: 8,
+			        maxlength:15,
+			        pwcheck: true
+			   }
+		    },
+		    // Specify validation error messages
+		    messages: {
+		    	emailId:{
+			    	  required : "Please provide a email",
+			    	  emailCustomFormat : "Please enter valid email format"
+			      },
+			      pass: {
+		        	required: "Please provide a password",
+		        	minlength: "Your password must be at least 8 characters long",
+		        	maxlength: "Your password maximum size 15 characters",
+		        	pwcheck:  "Your password must contain numbers and characters"
+		      	},
+		      	confPass: {
+		        	required: "Please provide a confirm password",
+		        	minlength: "Your password must be at least 8 characters long",
+		        	maxlength: "Your confirm password maximum size 15 characters",
+		        	pwcheck:  "Your password must contain numbers and characters"
+		      	}
+		    },
+		    // Make sure the form is submitted to the destination defined
+		    // in the "action" attribute of the form when valid
+		    submitHandler: function(form) {
+		      form.submit();
+		    }
+		  });
+		});
 	$("#verifyVoter").click(function() {
 			
 			var licenseNo= document.getElementById('licenseNoInput').value;

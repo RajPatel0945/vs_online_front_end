@@ -20,6 +20,10 @@
 	height: 200px;
 	background: #aaa;
 }
+
+form .error {
+  color: #ff0000;
+}
 </style>
 </head>
 </head>
@@ -54,7 +58,7 @@
   			</div>
 				</c:if>
 				<form:form method="POST"
-					action="${pageContext.servletContext.contextPath}/login"
+					action="${pageContext.servletContext.contextPath}/login" name="login"
 					modelAttribute="login">
 					<div class="mb-3 mt-3">
 					
@@ -71,5 +75,59 @@
 			</div>
 		</div>
 	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+	<script>
+	jQuery.validator.addMethod("emailCustomFormat", function (value, element) {
+        return this.optional(element) || /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/.test(value);
+    }, "Please enter valid email address");
+	
+	jQuery.validator.addMethod("pwcheck", function(value) {
+		   return /^[A-Za-z0-9\d=!\-@._*]*$/.test(value) // consists of only these
+		       && /[a-z]/.test(value) // has a lowercase letter
+		       && /\d/.test(value) // has a digit
+		});
+	$(function() {
+		  // Initialize form validation on the registration form.
+		  // It has the name attribute "registration"
+		  $("form[name='login']").validate({
+		    // Specify validation rules
+		    rules: {
+		      // The key name on the left side is the name attribute
+		      // of an input field. Validation rules are defined
+		      // on the right side
+		      emailId:{
+		    	  required : true,
+		    	  emailCustomFormat : true
+		      },
+		 
+		      password: {
+		        required: true,
+		        minlength: 8,
+		        maxlength:15,
+		        pwcheck: true
+		      }
+		    },
+		    // Specify validation error messages
+		    messages: {
+		    	emailId:{
+			    	  required : "Please provide a email",
+			    	  emailCustomFormat : "Please enter valid email format"
+			      },
+			      password: {
+		        	required: "Please provide a password",
+		        	minlength: "Your password must be at least 8 characters long",
+		        	maxlength: "Your password maximum size 15 characters",
+		        	pwcheck:  "Your password must contain numbers and characters"
+		      	}
+		    },
+		    // Make sure the form is submitted to the destination defined
+		    // in the "action" attribute of the form when valid
+		    submitHandler: function(form) {
+		      form.submit();
+		    }
+		  });
+		});
+	</script>
 </body>
 </html>
